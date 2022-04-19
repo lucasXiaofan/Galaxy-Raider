@@ -35,4 +35,4 @@ In the project directory, you can run:
 
 ## Learn More About Unity & C#
 You can learn more in the [Unity Documentation](https://docs.unity3d.com/Manual/index.html).
-To learn C#, check out the Microsoft [C# Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/).
+<br/>To learn C#, check out the Microsoft [C# Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/).
