@@ -29,10 +29,6 @@
     - The PR is approved, and it gets merged onto the main branch. Everyone can pull from this branch to have access to whatever feature you completed.
 5. Read Steps 3 & 4 again!! This is absolutely important to prevent merge conflicts.
 
-## Available Scripts [If Applicable]
-In the project directory, you can run:
-
-
 ## Learn More About Unity & C#
 You can learn more in the [Unity Documentation](https://docs.unity3d.com/Manual/index.html).
 <br/>To learn C#, check out the Microsoft [C# Documentation](https://docs.microsoft.com/en-us/dotnet/csharp/).
