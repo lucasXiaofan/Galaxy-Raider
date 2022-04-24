@@ -8,7 +8,6 @@
 4. Set Visual Studio (or your preferred IDE) as your default IDE in Unity
 5. Create a Unity Account
 6. Activate a new Student/Personal license
-7. `Other Dependencies here...`
 
 ###### Git & Github GUIs:
 1. Download and install [Git](https://git-scm.com/downloads).
