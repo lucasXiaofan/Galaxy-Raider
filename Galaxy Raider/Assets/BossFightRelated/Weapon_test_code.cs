@@ -45,6 +45,12 @@ public class Weapon_test_code : MonoBehaviour
         {
             PlayhitEffect(hit);
             Debug.Log(hit.transform.name);
+            enmeyHealth target = hit.transform.GetComponent<enmeyHealth>();
+            if (target == null)
+            {
+                return;
+            }
+            target.takeDamage(damage);
         }
         else
         {

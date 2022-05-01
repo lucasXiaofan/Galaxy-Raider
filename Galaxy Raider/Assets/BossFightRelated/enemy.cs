@@ -21,18 +21,31 @@ public class enemy : MonoBehaviour
     public float jumpSpeed = 2;
     public float coolDown = 0.0f;
     public float nextJumpTime = 3.0f;
+    //health
+    enmeyHealth health;
 
 
     // Start is called before the first frame update
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        health = GetComponent<enmeyHealth>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (health.isDead())
+        {
+            enabled = false;
+            navMeshAgent.enabled = false;
+            EnemyTest.gameObject.SetActive(false);
+
+        }
         distanceToTarget = Vector3.Distance(target.position, transform.position);
+
+
         if (isProvoked) //&& !canJumpAttack(EnemyTest, target))
         {
             EngageTarget();
