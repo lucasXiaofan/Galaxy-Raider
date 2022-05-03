@@ -1376,6 +1376,7 @@ GameObject:
   - component: {fileID: 1724742327}
   - component: {fileID: 1724742326}
   - component: {fileID: 1724742325}
+  - component: {fileID: 1724742328}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1431,6 +1432,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1724742328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724742324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c4f31644abe4945abbb6adccae10bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoslots:
+  - ammot: 0
+    ammoAmount: 10
+  - ammot: 1
+    ammoAmount: 3
 --- !u!1 &1790328961
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,6 +1695,8 @@ MonoBehaviour:
   range: 50
   damage: 30
   hiteffect: {fileID: 489147132}
+  ammoTYPE: 0
+  ammoSlot: {fileID: 1724742328}
   bullet_live_time: 3
   canShoot: 1
   fireRate: 15
