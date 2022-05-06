@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/BossFightRelated/boss-fight-related.unity
+    guid: cdead57518c609a4f92c3acd79c6b040
   m_configObjects: {}

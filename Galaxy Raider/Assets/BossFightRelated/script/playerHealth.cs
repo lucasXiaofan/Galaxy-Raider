@@ -9,15 +9,17 @@ public class playerHealth : MonoBehaviour
     public GameObject GameOverUI;
     private void Start()
     {
-        playerHitPoint = 100f;
+
         Cursor.lockState = CursorLockMode.Locked;
+        Time.timeScale = 1f;
+        print(playerHitPoint);
         Cursor.visible = false;
         GameOverUI.SetActive(false);
     }
     public void playerTakeDamge(float damage)
     {
         playerHitPoint -= damage;
-        print(playerHitPoint);
+        // print(playerHitPoint);
         if (playerHitPoint <= 0)
         {
             afterDeath();
