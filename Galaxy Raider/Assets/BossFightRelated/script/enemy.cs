@@ -118,15 +118,13 @@ public class enemy : MonoBehaviour
             if (distanceToTarget < 9f)
             {
                 enemyChase();
-                print("engaging" + Time.deltaTime);
+
             }
             else
             {
-                enemyChase();
                 if (canJumpAttack(EnemyTest, target))
                 {
                     StartCoroutine(jumpAttack(EnemyTest, target));
-                    Debug.Log("jumpattack " + Time.time);
                 }
             }
 
