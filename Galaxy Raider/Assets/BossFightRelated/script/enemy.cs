@@ -15,6 +15,7 @@ public class enemy : MonoBehaviour
     bool isProvoked = false;
     // experiment for jump attack
     [SerializeField] Transform EnemyTest;
+    [SerializeField] float enemyDamage = 40f;
     public float minJumpDistance = 3f;
     public float maxJumpDistance = 30f;
     public AnimationCurve heightCurve;
@@ -127,9 +128,19 @@ public class enemy : MonoBehaviour
                     StartCoroutine(jumpAttack(EnemyTest, target));
                 }
             }
-
+        }
+        if (distanceToTarget <= navMeshAgent.stoppingDistance)
+        {
+            enemyAttack();
         }
 
+    }
+
+    private void enemyAttack()
+    {
+        playerHealth playerH = target.GetComponent<playerHealth>();
+        if (target == null) return;
+        playerH.playerTakeDamge(enemyDamage);
     }
 
     private void enemyChase()
