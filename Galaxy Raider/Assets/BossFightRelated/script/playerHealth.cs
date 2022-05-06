@@ -9,6 +9,7 @@ public class playerHealth : MonoBehaviour
     public GameObject GameOverUI;
     private void Start()
     {
+        playerHitPoint = 100f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         GameOverUI.SetActive(false);

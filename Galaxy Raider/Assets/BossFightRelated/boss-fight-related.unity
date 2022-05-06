@@ -2326,7 +2326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ammoslots:
   - ammot: 0
-    ammoAmount: 100
+    ammoAmount: 100000
   - ammot: 1
     ammoAmount: 30
 --- !u!114 &1724742329
