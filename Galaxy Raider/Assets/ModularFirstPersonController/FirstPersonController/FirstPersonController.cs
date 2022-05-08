@@ -319,6 +319,7 @@ public class FirstPersonController : MonoBehaviour
                 float sprintRemainingPercent = sprintRemaining / sprintDuration;
                 sprintBar.transform.localScale = new Vector3(sprintRemainingPercent, 1f, 1f);
             }
+            
         }
 
         #endregion
@@ -368,6 +369,16 @@ public class FirstPersonController : MonoBehaviour
         if (Input.GetKeyDown(sprintKey))
         {
             rb.AddForce(transform.forward * 50, ForceMode.Impulse);
+            // quickly decreases sprintBar by 100 instead of 1
+            if(!unlimitedSprint)
+                {
+                    sprintRemaining -= 100 * Time.deltaTime;
+                    if (sprintRemaining <= 0)
+                    {
+                        isSprinting = false;
+                        isSprintCooldown = true;
+                    }
+                }
         }
 
         
