@@ -51,9 +51,6 @@ public class enemy : MonoBehaviour
         {
             EngageTarget();
         }
-
-
-
         else if (distanceToTarget <= chaseRange)
         {
             isProvoked = true;
@@ -93,8 +90,6 @@ public class enemy : MonoBehaviour
         {
             navMeshAgent.Warp(hit.position);
             isProvoked = true;
-            Debug.Log("chase mode");
-
         }
     }
 
@@ -114,6 +109,7 @@ public class enemy : MonoBehaviour
 
     private void EngageTarget()
     {
+        FaceTarget();
         if (distanceToTarget >= navMeshAgent.stoppingDistance)
         {
             if (distanceToTarget < 9f)
@@ -138,13 +134,22 @@ public class enemy : MonoBehaviour
 
     private void enemyAttack()
     {
-        playerHealth playerH = target.GetComponent<playerHealth>();
-        if (target == null) return;
-        playerH.playerTakeDamge(enemyDamage);
+
+        GetComponent<Animator>().SetBool("Spin", true);
+        GetComponent<Animator>().SetBool("Normal", false);
     }
 
     private void enemyChase()
     {
+
         navMeshAgent.SetDestination(target.position);
+        GetComponent<Animator>().SetBool("Spin", false);
+        GetComponent<Animator>().SetBool("Normal", true);
+    }
+    void FaceTarget()
+    {
+        Vector3 curDirection = (target.position - transform.position);
+        Quaternion TargetRotation = Quaternion.LookRotation(new Vector3(curDirection.x, 0, curDirection.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, TargetRotation, Time.deltaTime * rotateSpeed);
     }
 }

@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class enemyHit : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] Transform attackTarget;
+    [SerializeField] float enemyDamage = 40f;
+    private void Start()
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    }
+    public void AttackHitEvent()
     {
-        
+        playerHealth target = attackTarget.GetComponent<playerHealth>();
+        if (attackTarget == null) return;
+        target.playerTakeDamge(enemyDamage);
     }
 }
