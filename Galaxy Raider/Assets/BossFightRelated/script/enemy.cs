@@ -135,16 +135,16 @@ public class enemy : MonoBehaviour
     private void enemyAttack()
     {
 
-        GetComponent<Animator>().SetBool("Spin", true);
-        GetComponent<Animator>().SetBool("Normal", false);
+        // GetComponent<Animator>().SetBool("Spin", true);
+        // GetComponent<Animator>().SetBool("Normal", false);
     }
 
     private void enemyChase()
     {
 
         navMeshAgent.SetDestination(target.position);
-        GetComponent<Animator>().SetBool("Spin", false);
-        GetComponent<Animator>().SetBool("Normal", true);
+        // GetComponent<Animator>().SetBool("Spin", false);
+        // GetComponent<Animator>().SetBool("Normal", true);
     }
     void FaceTarget()
     {
