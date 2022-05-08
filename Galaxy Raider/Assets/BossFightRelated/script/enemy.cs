@@ -15,6 +15,7 @@ public class enemy : MonoBehaviour
     bool isProvoked = false;
     // experiment for jump attack
     [SerializeField] Transform EnemyTest;
+    [SerializeField] float enemyDamage = 40f;
     public float minJumpDistance = 3f;
     public float maxJumpDistance = 30f;
     public AnimationCurve heightCurve;
@@ -50,9 +51,6 @@ public class enemy : MonoBehaviour
         {
             EngageTarget();
         }
-
-
-
         else if (distanceToTarget <= chaseRange)
         {
             isProvoked = true;
@@ -92,8 +90,6 @@ public class enemy : MonoBehaviour
         {
             navMeshAgent.Warp(hit.position);
             isProvoked = true;
-            Debug.Log("chase mode");
-
         }
     }
 
@@ -113,29 +109,47 @@ public class enemy : MonoBehaviour
 
     private void EngageTarget()
     {
+        FaceTarget();
         if (distanceToTarget >= navMeshAgent.stoppingDistance)
         {
             if (distanceToTarget < 9f)
             {
                 enemyChase();
-                print("engaging" + Time.deltaTime);
+
             }
             else
             {
-                enemyChase();
                 if (canJumpAttack(EnemyTest, target))
                 {
                     StartCoroutine(jumpAttack(EnemyTest, target));
-                    Debug.Log("jumpattack " + Time.time);
                 }
             }
-
+        }
+        if (distanceToTarget <= navMeshAgent.stoppingDistance)
+        {
+            enemyAttack();
         }
 
     }
 
+    private void enemyAttack()
+    {
+
+        // GetComponent<Animator>().SetBool("Spin", true);
+        // GetComponent<Animator>().SetBool("Normal", false);
+    }
+
     private void enemyChase()
     {
+
         navMeshAgent.SetDestination(target.position);
+        // GetComponent<Animator>().SetBool("Spin", false);
+        // GetComponent<Animator>().SetBool("Normal", true);
+    }
+    void FaceTarget()
+    {
+        Vector3 curDirection = (target.position - transform.position);
+        Quaternion TargetRotation = Quaternion.LookRotation(new Vector3(curDirection.x, 0, curDirection.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, TargetRotation, Time.deltaTime * rotateSpeed);
     }
 }

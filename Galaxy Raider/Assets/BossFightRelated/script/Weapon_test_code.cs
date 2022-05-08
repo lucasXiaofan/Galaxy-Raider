@@ -7,6 +7,8 @@ public class Weapon_test_code : MonoBehaviour
     [SerializeField] float range = 50f;
     [SerializeField] float damage = 30f;
     [SerializeField] GameObject hiteffect;
+    [SerializeField] ammoType ammoTYPE;
+    [SerializeField] Ammo ammoSlot;
     public float bullet_live_time = 3.0f;
     public bool canShoot = true;
     public float fireRate = 15f;
@@ -35,8 +37,13 @@ public class Weapon_test_code : MonoBehaviour
 
     private void ShootAuto()
     {
-        processRayCast();
+        if (ammoSlot.getCurrentAmmo(ammoTYPE) > 0)
+        {
+            processRayCast();
+            ammoSlot.descreaseAmmo(ammoTYPE);
+        }
     }
+
 
     private void processRayCast()
     {
