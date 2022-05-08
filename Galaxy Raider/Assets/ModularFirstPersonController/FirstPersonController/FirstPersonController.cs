@@ -363,6 +363,13 @@ public class FirstPersonController : MonoBehaviour
             HeadBob();
         }
 
+        // ----------------- -DASHING ------------------
+        // CTRL-f GetKey(sprintKey) for the other GetKey part for sprinting
+        if (Input.GetKeyDown(sprintKey))
+        {
+            rb.AddForce(transform.forward * 50, ForceMode.Impulse);
+        }
+
         
     }
 
@@ -385,6 +392,8 @@ public class FirstPersonController : MonoBehaviour
             {
                 isWalking = false;
             }
+
+
 
             // All movement calculations shile sprint is active
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
