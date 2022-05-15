@@ -13,12 +13,13 @@ public class enmeyHealth : MonoBehaviour
     public void takeDamage(float damage)
     {
         hitPoint -= damage;
-        print(hitPoint);
+
         if (hitPoint <= 0)
         {
             if (Dead) return;
             Dead = true;
         }
+        print(" from enemy health" + isDead());
     }
 
 }
