@@ -9,7 +9,7 @@ public class PowerPlant : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.gameObject.SetActive(true);
+
         health = GetComponent<enmeyHealth>();
     }
 
@@ -18,7 +18,7 @@ public class PowerPlant : MonoBehaviour
     {
         if (health.isDead() == true)
         {
-            print("yeas");
+
             transform.gameObject.SetActive(false);
         }
 
