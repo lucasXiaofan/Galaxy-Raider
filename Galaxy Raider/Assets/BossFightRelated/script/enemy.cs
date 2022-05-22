@@ -19,16 +19,18 @@ public class enemy : MonoBehaviour
     public float minJumpDistance = 3f;
     public float maxJumpDistance = 30f;
     public AnimationCurve heightCurve;
-    public float jumpSpeed = 2;
+    public float jumpSpeed = 1;
     public float coolDown = 0.0f;
     public float nextJumpTime = 3.0f;
     //health
     enmeyHealth health;
+    [SerializeField] Transform AoeIndicator;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        AoeIndicator.gameObject.SetActive(false);
         navMeshAgent = GetComponent<NavMeshAgent>();
         health = GetComponent<enmeyHealth>();
 
@@ -74,6 +76,9 @@ public class enemy : MonoBehaviour
         // having this to store the position temporarily 
         Vector3 startingPosition = enemyTest.position;
         Vector3 jumpEnd = target.position;
+        AoeIndicator.gameObject.SetActive(true);
+        AoeIndicator.position = jumpEnd;
+        yield return new WaitForSeconds(1);
 
         for (float time = 0; time < 1; time += Time.deltaTime * jumpSpeed)
         {
@@ -83,15 +88,17 @@ public class enemy : MonoBehaviour
             yield return null;
         }
         //reset cooldown each time after jump
+        AoeIndicator.gameObject.SetActive(false);
         coolDown = 0;
         navMeshAgent.enabled = true;
 
-        if (NavMesh.SamplePosition(target.position, out NavMeshHit hit, 1f, navMeshAgent.areaMask))
+        if (NavMesh.SamplePosition(jumpEnd, out NavMeshHit hit, 1f, navMeshAgent.areaMask))
         {
             navMeshAgent.Warp(hit.position);
             isProvoked = true;
         }
     }
+
 
     public bool canJumpAttack(Transform enemyt, Transform player)
     {
