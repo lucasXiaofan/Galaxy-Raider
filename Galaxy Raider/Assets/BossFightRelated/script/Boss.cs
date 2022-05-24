@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+
 public class Boss : MonoBehaviour
 {
     [SerializeField] Transform target;
@@ -17,10 +18,16 @@ public class Boss : MonoBehaviour
     [SerializeField] Powershield powershield;
     //
     //enemy jump
+    public float jumpCoolDown;
+    public float nextJumpTime;
     public float minJumpDistance = 3f;
     public float maxJumpDistance = 30f;
     public AnimationCurve heightCurve;
     [SerializeField] Transform AoeIndicator;
+    //
+    // laser spin
+    [SerializeField] Transform laser;
+
     //
     private State state;
     private enum State
@@ -63,9 +70,10 @@ public class Boss : MonoBehaviour
                 chasePlayer();
                 break;
             case State.jumpAttack:
-
+                jAttack();
                 break;
             case State.laserSpin:
+                //StartCoroutine(spin(bossBody, laser));
                 break;
             case State.dead:
                 bossDie();
@@ -74,6 +82,33 @@ public class Boss : MonoBehaviour
         }
 
     }
+    // private IEnumerator spin(Transform boss, Transform laser)
+    // {
+
+    // }
+    private bool canJumpAttack(Transform boss, Transform player)
+    {
+        jumpCoolDown += Time.deltaTime;
+        float distance = Vector3.Distance(boss.position, player.position);
+        if (jumpCoolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void jAttack()
+    {
+        Vector3 jumpDestination = target.position;
+        AoeIndicator.gameObject.SetActive(true);
+        AoeIndicator.position = jumpDestination;
+
+    }
+    // private IEnumerator bossJump(Vector3 targetPos, Transform boss)
+    // {
+    //     NavMeshAgent.enabled = false;
+
+    // }
 
     private void Shielded()
     {
