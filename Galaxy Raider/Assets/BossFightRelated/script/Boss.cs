@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
 public class Boss : MonoBehaviour
 {
     [SerializeField] Transform target;
@@ -14,6 +13,7 @@ public class Boss : MonoBehaviour
     bool activated = false;
     [SerializeField] Transform bossBody;
     [SerializeField] float enemyDamage = 40f;
+    public float chaseRange = 20f;
     //shield
     [SerializeField] Powershield powershield;
     //
@@ -27,6 +27,7 @@ public class Boss : MonoBehaviour
     //
     // laser spin
     [SerializeField] Transform laser;
+    public float laserSize = 30f;
 
     //
     private State state;
@@ -71,9 +72,11 @@ public class Boss : MonoBehaviour
                 break;
             case State.jumpAttack:
                 jAttack();
+
                 break;
             case State.laserSpin:
-                //StartCoroutine(spin(bossBody, laser));
+                StartCoroutine(spin(bossBody, laser));
+                facePlayer();
                 break;
             case State.dead:
                 bossDie();
@@ -82,10 +85,27 @@ public class Boss : MonoBehaviour
         }
 
     }
-    // private IEnumerator spin(Transform boss, Transform laser)
-    // {
-
-    // }
+    private IEnumerator spin(Transform boss, Transform laser)
+    {
+        float duration = 2f;
+        nav.enabled = false;
+        laser.localScale = new Vector3(1, 1, laserSize);
+        float startRotation = transform.eulerAngles.y;
+        float endRotation = startRotation + 360.0f;
+        float t = 0.0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            float yRotation = Mathf.Lerp(startRotation, endRotation, t / duration) % 360.0f;
+            boss.eulerAngles = new Vector3(boss.eulerAngles.x, yRotation,
+            boss.eulerAngles.z);
+            yield return null;
+        }
+        laser.localScale = new Vector3(1, 1, 1);
+        nav.enabled = true;
+        yield return new WaitForSeconds(1);
+        state = State.unshieldedMovingWithShooting;
+    }
     private bool canJumpAttack(Transform boss, Transform player)
     {
         jumpCoolDown += Time.deltaTime;
@@ -128,6 +148,11 @@ public class Boss : MonoBehaviour
     private void chasePlayer()
     {
         nav.SetDestination(target.position);
+        float distance = Vector3.Distance(bossBody.position, target.position);
+        if (distance >= chaseRange)
+        {
+            state = State.laserSpin;
+        }
     }
 
     private void bossDie()
