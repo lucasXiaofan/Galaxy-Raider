@@ -68,7 +68,7 @@ public class Boss : MonoBehaviour
                 break;
             case State.unshieldedMovingWithShooting:
                 facePlayer();
-                chasePlayer();
+                chasePlayer(laser);
                 break;
             case State.jumpAttack:
                 jAttack();
@@ -101,7 +101,7 @@ public class Boss : MonoBehaviour
             boss.eulerAngles.z);
             yield return null;
         }
-        laser.localScale = new Vector3(1, 1, 1);
+        
         nav.enabled = true;
         yield return new WaitForSeconds(1);
         state = State.unshieldedMovingWithShooting;
@@ -145,9 +145,10 @@ public class Boss : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, TargetRotation, Time.deltaTime * rotateSpeed);
     }
 
-    private void chasePlayer()
+    private void chasePlayer(Transform laser)
     {
         nav.SetDestination(target.position);
+        laser.localScale = new Vector3(1, 1, 1);
         float distance = Vector3.Distance(bossBody.position, target.position);
         if (distance >= chaseRange)
         {

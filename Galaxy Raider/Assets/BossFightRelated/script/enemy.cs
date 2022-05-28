@@ -21,11 +21,12 @@ public class enemy : MonoBehaviour
     public float maxJumpDistance = 30f;
     public AnimationCurve heightCurve;
     public float jumpSpeed = 1;
-    public float coolDown = 0.0f;
+    [SerializeField] float coolDown = 0.0f;
     public float nextJumpTime = 3.0f;
     //health
     enmeyHealth health;
     [SerializeField] Transform AoeIndicator;
+    bool isJumping = false;
 
 
     // Start is called before the first frame update
@@ -40,6 +41,10 @@ public class enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isJumping) {
+            return;
+        }
+        
         if (health.isDead())
         {
             enabled = false;
@@ -62,6 +67,8 @@ public class enemy : MonoBehaviour
         {
             isProvoked = false;
         }
+
+        coolDown += Time.deltaTime;
     }
     void OnDrawGizmosSelected()
     {
@@ -72,7 +79,7 @@ public class enemy : MonoBehaviour
 
     private IEnumerator jumpAttack(Transform enemyTest, Transform target)
     {
-
+        isJumping = true;
         navMeshAgent.enabled = false;
         // having this to store the position temporarily 
         Vector3 startingPosition = enemyTest.position;
@@ -90,54 +97,45 @@ public class enemy : MonoBehaviour
         }
         //reset cooldown each time after jump
         AoeIndicator.gameObject.SetActive(false);
-        coolDown = 0;
-        navMeshAgent.enabled = true;
 
         if (NavMesh.SamplePosition(jumpEnd, out NavMeshHit hit, 1f, navMeshAgent.areaMask))
         {
             navMeshAgent.Warp(hit.position);
-            isProvoked = true;
         }
+        navMeshAgent.enabled = true;
+        isJumping = false;
     }
 
 
     public bool canJumpAttack(Transform enemyt, Transform player)
     {
-        coolDown += Time.deltaTime; // more research about time.deltatime
-        //what is the difference between Time.time and Time.deltaTime
         float distance = Vector3.Distance(enemyt.position, player.position);
         // cooldown > nextJumptime 
-        if (coolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance)
-        {
-            return true;
-        }
-        return false;
+        return coolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance;   
     }
 
 
     private void EngageTarget()
     {
         FaceTarget();
-        if (distanceToTarget >= navMeshAgent.stoppingDistance)
-        {
-            if (distanceToTarget < 9f)
-            {
-                enemyChase();
 
-            }
-            else
-            {
-                if (canJumpAttack(EnemyTest, target))
-                {
-                    StartCoroutine(jumpAttack(EnemyTest, target));
-                }
-            }
-        }
         if (distanceToTarget <= navMeshAgent.stoppingDistance)
         {
             enemyAttack();
+            return;
         }
 
+        if (distanceToTarget < 9f)
+        {
+            enemyChase();
+            return;
+        }
+        
+        if (canJumpAttack(EnemyTest, target))
+        {
+            StartCoroutine(jumpAttack(EnemyTest, target));
+            coolDown = 0;
+        }
     }
 
     private void enemyAttack()
