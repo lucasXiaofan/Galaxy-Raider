@@ -33,8 +33,10 @@ public class Boss : MonoBehaviour
     [SerializeField] float laserCoolDown = 0.0f;
     [SerializeField] float nextLaser = 15f;
     [SerializeField] float laserSpeed = 90f;
-    private bool Notlasered = true;
-
+    private bool Notlasered = false;
+    //deal damage distance
+    [SerializeField] float damageRange = 10f;
+    [SerializeField] float bossDamage = 3f;
     //
     private State state;
     private enum State
@@ -82,6 +84,7 @@ public class Boss : MonoBehaviour
                 break;
             case State.jumpAttack:
                 StartCoroutine(jAttack(bossBody,target));
+                
                 Notjumped = false;
                 Notlasered = true;
                 jumpCoolDown = 0f;
@@ -90,6 +93,7 @@ public class Boss : MonoBehaviour
             case State.laserSpin:
                 facePlayer();
                 StartCoroutine(spin(bossBody, laser));
+                
                 Notlasered = false;
                 Notjumped = true;
                 laserCoolDown = 0f;
@@ -109,7 +113,7 @@ public class Boss : MonoBehaviour
         nav.enabled = false;
         Vector3 aimposition = target.position;
         yield return new WaitForSeconds(.2f);
-        
+        JumpAndSpinDamageToPlayer();
         laserScale += laserSpeed*Time.deltaTime;
         
         laser.localScale = new Vector3(1, 1, laserScale);
@@ -135,6 +139,17 @@ public class Boss : MonoBehaviour
         float distance = Vector3.Distance(boss.position, player.position);
         return jumpCoolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance;
     }
+    private void JumpAndSpinDamageToPlayer()
+    {
+        float distance = Vector3.Distance(bossBody.position, target.position);
+        print("the distance between boss and player "+distance);
+        if(distance<=damageRange)
+        {
+            playerHealth player = target.GetComponent<playerHealth>();
+            if(player == null) return;
+            player.playerTakeDamge(bossDamage);
+        }
+    }
 
     private IEnumerator jAttack(Transform boss,Transform target)
 
@@ -153,6 +168,7 @@ public class Boss : MonoBehaviour
             yield return null;
         }
         AoeIndicator.gameObject.SetActive(false);
+        JumpAndSpinDamageToPlayer();
         if (NavMesh.SamplePosition(jumpDestination, out NavMeshHit hit, 1f,nav.areaMask))
         {
             nav.Warp(hit.position);
@@ -182,7 +198,7 @@ public class Boss : MonoBehaviour
         float distance = Vector3.Distance(bossBody.position, target.position);
 
         laser.localScale = new Vector3(1, 1, 1);
-        if (distance <= chaseRange)
+        if (distance <= chaseRange+15)
         {
             nav.SetDestination(target.position);
         }
