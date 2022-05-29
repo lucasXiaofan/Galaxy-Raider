@@ -13,21 +13,27 @@ public class Boss : MonoBehaviour
     bool activated = false;
     [SerializeField] Transform bossBody;
     [SerializeField] float enemyDamage = 40f;
-    public float chaseRange = 20f;
+    [SerializeField] float chaseRange = 20f;
     //shield
     [SerializeField] Powershield powershield;
     //
     //enemy jump
-    public float jumpCoolDown;
-    public float nextJumpTime;
-    public float minJumpDistance = 3f;
-    public float maxJumpDistance = 30f;
-    public AnimationCurve heightCurve;
+    [SerializeField] float jumpCoolDown = 0.0f;
+    [SerializeField] float nextJumpTime = 5f;
+    [SerializeField] float minJumpDistance = 3f;
+    [SerializeField] float maxJumpDistance = 30f;
+    [SerializeField] AnimationCurve heightCurve;
     [SerializeField] Transform AoeIndicator;
+    private bool Notjumped = true;
     //
     // laser spin
+    private float laserScale = 1f;
     [SerializeField] Transform laser;
-    public float laserSize = 30f;
+    [SerializeField] float laserSize = 30f;
+    [SerializeField] float laserCoolDown = 0.0f;
+    [SerializeField] float nextLaser = 15f;
+    [SerializeField] float laserSpeed = 90f;
+    private bool Notlasered = true;
 
     //
     private State state;
@@ -59,8 +65,12 @@ public class Boss : MonoBehaviour
             nav.enabled = false;
             state = State.dead;
         }
+        jumpCoolDown+= Time.deltaTime;
+        laserCoolDown+=Time.deltaTime;
         switch (state)
         {
+            //distanceToTarget = Vector3.Distance(target.position, transform.position);
+
             default:
             case State.shieldedWithMissle:
                 facePlayer();
@@ -71,25 +81,38 @@ public class Boss : MonoBehaviour
                 chasePlayer(laser);
                 break;
             case State.jumpAttack:
-                jAttack();
-
+                StartCoroutine(jAttack(bossBody,target));
+                Notjumped = false;
+                Notlasered = true;
+                jumpCoolDown = 0f;
+                
                 break;
             case State.laserSpin:
-                StartCoroutine(spin(bossBody, laser));
                 facePlayer();
+                StartCoroutine(spin(bossBody, laser));
+                Notlasered = false;
+                Notjumped = true;
+                laserCoolDown = 0f;
+                
                 break;
             case State.dead:
                 bossDie();
                 break;
-
+            
         }
+        
 
     }
     private IEnumerator spin(Transform boss, Transform laser)
     {
-        float duration = 2f;
+        float duration = 1f;
         nav.enabled = false;
-        laser.localScale = new Vector3(1, 1, laserSize);
+        Vector3 aimposition = target.position;
+        yield return new WaitForSeconds(.2f);
+        
+        laserScale += laserSpeed*Time.deltaTime;
+        
+        laser.localScale = new Vector3(1, 1, laserScale);
         float startRotation = transform.eulerAngles.y;
         float endRotation = startRotation + 360.0f;
         float t = 0.0f;
@@ -108,27 +131,36 @@ public class Boss : MonoBehaviour
     }
     private bool canJumpAttack(Transform boss, Transform player)
     {
-        jumpCoolDown += Time.deltaTime;
+        
         float distance = Vector3.Distance(boss.position, player.position);
-        if (jumpCoolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance)
-        {
-            return true;
-        }
-        return false;
+        return jumpCoolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance;
     }
 
-    private void jAttack()
+    private IEnumerator jAttack(Transform boss,Transform target)
+
     {
+        nav.enabled = false;
+        Vector3 startPosition = boss.position;
         Vector3 jumpDestination = target.position;
         AoeIndicator.gameObject.SetActive(true);
         AoeIndicator.position = jumpDestination;
+        yield return new WaitForSeconds(0.5f);
 
+        for (float time= 0; time <1; time += Time.deltaTime*1.0f)
+        {
+            boss.position = Vector3.Lerp(startPosition,jumpDestination,time)
+                +Vector3.up*heightCurve.Evaluate(time);
+            yield return null;
+        }
+        AoeIndicator.gameObject.SetActive(false);
+        if (NavMesh.SamplePosition(jumpDestination, out NavMeshHit hit, 1f,nav.areaMask))
+        {
+            nav.Warp(hit.position);
+        }
+        nav.enabled = true;
+        state = State.unshieldedMovingWithShooting;
     }
-    // private IEnumerator bossJump(Vector3 targetPos, Transform boss)
-    // {
-    //     NavMeshAgent.enabled = false;
-
-    // }
+    
 
     private void Shielded()
     {
@@ -147,12 +179,25 @@ public class Boss : MonoBehaviour
 
     private void chasePlayer(Transform laser)
     {
-        nav.SetDestination(target.position);
-        laser.localScale = new Vector3(1, 1, 1);
         float distance = Vector3.Distance(bossBody.position, target.position);
-        if (distance >= chaseRange)
+
+        laser.localScale = new Vector3(1, 1, 1);
+        if (distance <= chaseRange)
         {
+            nav.SetDestination(target.position);
+        }
+        
+        if (distance >= chaseRange && laserCoolDown >= nextLaser && Notlasered)
+        {
+            
+            
             state = State.laserSpin;
+        }
+        else if (distance >= chaseRange && jumpCoolDown>= nextJumpTime && Notjumped)
+        {
+            
+            
+            state = State.jumpAttack;
         }
     }
 
