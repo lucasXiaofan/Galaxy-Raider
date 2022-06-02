@@ -6,7 +6,7 @@ public class enmeyHealth : MonoBehaviour
 {
     [SerializeField] float hitPoint = 200f;
     [SerializeField] float totalHitPoint = 200f;
-    public HealthBar healtbar;
+    public HealthBar healtbarObject;
     bool Dead = false;
     public bool isDead()
     {
@@ -15,7 +15,7 @@ public class enmeyHealth : MonoBehaviour
     public void takeDamage(float damage)
     {
         hitPoint -= damage;
-        healtbar.UpdateHealth((float)hitPoint / (float)totalHitPoint);
+        healtbarObject.UpdateHealth((float)hitPoint / (float)totalHitPoint);
         if (hitPoint <= 0)
         {
             if (Dead) return;

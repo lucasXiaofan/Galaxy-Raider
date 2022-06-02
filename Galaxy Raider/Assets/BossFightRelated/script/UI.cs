@@ -9,4 +9,9 @@ public class UI : MonoBehaviour
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
     }
+    public void QuitGame()
+    {
+        print("quitgameSuccess");
+        Application.Quit();
+    }
 }

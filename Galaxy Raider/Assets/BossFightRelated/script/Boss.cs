@@ -37,6 +37,16 @@ public class Boss : MonoBehaviour
     //deal damage distance
     [SerializeField] float damageRange = 10f;
     [SerializeField] float bossDamage = 3f;
+    [SerializeField] Transform damageSphere;
+    //
+    // missile
+    //[SerializeField] Transform player;
+    [SerializeField] GameObject missilePrefab;
+    [SerializeField] Transform launchPlace;
+    private float MissileCoolDown = 0.0f;
+    private float nextLunach = 3f;
+    public float missileSpeed = 3f;
+
     //
     private State state;
     private enum State
@@ -66,15 +76,25 @@ public class Boss : MonoBehaviour
             enabled = false;
             nav.enabled = false;
             state = State.dead;
+            damageSphere.gameObject.SetActive(false);
         }
-        jumpCoolDown+= Time.deltaTime;
-        laserCoolDown+=Time.deltaTime;
+        jumpCoolDown += Time.deltaTime;
+        laserCoolDown += Time.deltaTime;
+        MissileCoolDown += Time.deltaTime;
         switch (state)
         {
             //distanceToTarget = Vector3.Distance(target.position, transform.position);
 
             default:
             case State.shieldedWithMissle:
+                if (MissileCoolDown > nextLunach)
+                {
+                    MissileCoolDown = 0;
+                    GameObject rocket = Instantiate(missilePrefab, launchPlace.position, missilePrefab.transform.rotation);
+                    rocket.transform.LookAt(target);
+                    StartCoroutine(SendHomingMissile(rocket));
+
+                }
                 facePlayer();
                 Shielded();
                 break;
@@ -83,29 +103,41 @@ public class Boss : MonoBehaviour
                 chasePlayer(laser);
                 break;
             case State.jumpAttack:
-                StartCoroutine(jAttack(bossBody,target));
-                
+                StartCoroutine(jAttack(bossBody, target));
+
                 Notjumped = false;
                 Notlasered = true;
                 jumpCoolDown = 0f;
-                
+
                 break;
             case State.laserSpin:
                 facePlayer();
                 StartCoroutine(spin(bossBody, laser));
-                
+
                 Notlasered = false;
                 Notjumped = true;
                 laserCoolDown = 0f;
-                
+
                 break;
             case State.dead:
                 bossDie();
                 break;
-            
-        }
-        
 
+        }
+
+
+    }
+    public IEnumerator SendHomingMissile(GameObject rocket)
+    {
+        while (Vector3.Distance(target.position, rocket.transform.position) > 0.3f)
+        {
+            rocket.transform.position += (target.position - rocket.transform.position).normalized * missileSpeed * Time.deltaTime;
+            rocket.transform.LookAt(target);
+            yield return null;
+        }
+        playerHealth player = target.GetComponent<playerHealth>();
+        player.playerTakeDamge(30f);
+        Destroy(rocket);
     }
     private IEnumerator spin(Transform boss, Transform laser)
     {
@@ -113,9 +145,9 @@ public class Boss : MonoBehaviour
         nav.enabled = false;
         Vector3 aimposition = target.position;
         yield return new WaitForSeconds(.2f);
-        JumpAndSpinDamageToPlayer();
-        laserScale += laserSpeed*Time.deltaTime;
-        
+        //JumpAndSpinDamageToPlayer();
+        laserScale += laserSpeed * Time.deltaTime;
+
         laser.localScale = new Vector3(1, 1, laserScale);
         float startRotation = transform.eulerAngles.y;
         float endRotation = startRotation + 360.0f;
@@ -128,30 +160,30 @@ public class Boss : MonoBehaviour
             boss.eulerAngles.z);
             yield return null;
         }
-        
+
         nav.enabled = true;
         yield return new WaitForSeconds(1);
         state = State.unshieldedMovingWithShooting;
     }
     private bool canJumpAttack(Transform boss, Transform player)
     {
-        
+
         float distance = Vector3.Distance(boss.position, player.position);
         return jumpCoolDown > nextJumpTime && distance >= minJumpDistance && distance <= maxJumpDistance;
     }
     private void JumpAndSpinDamageToPlayer()
     {
         float distance = Vector3.Distance(bossBody.position, target.position);
-        print("the distance between boss and player "+distance);
-        if(distance<=damageRange)
+        print("the distance between boss and player " + distance);
+        if (distance <= damageRange)
         {
             playerHealth player = target.GetComponent<playerHealth>();
-            if(player == null) return;
+            if (player == null) return;
             player.playerTakeDamge(bossDamage);
         }
     }
 
-    private IEnumerator jAttack(Transform boss,Transform target)
+    private IEnumerator jAttack(Transform boss, Transform target)
 
     {
         nav.enabled = false;
@@ -161,22 +193,25 @@ public class Boss : MonoBehaviour
         AoeIndicator.position = jumpDestination;
         yield return new WaitForSeconds(0.5f);
 
-        for (float time= 0; time <1; time += Time.deltaTime*1.0f)
+        for (float time = 0; time < 1; time += Time.deltaTime * 1.0f)
         {
-            boss.position = Vector3.Lerp(startPosition,jumpDestination,time)
-                +Vector3.up*heightCurve.Evaluate(time);
+            boss.position = Vector3.Lerp(startPosition, jumpDestination, time)
+                + Vector3.up * heightCurve.Evaluate(time);
             yield return null;
         }
         AoeIndicator.gameObject.SetActive(false);
-        JumpAndSpinDamageToPlayer();
-        if (NavMesh.SamplePosition(jumpDestination, out NavMeshHit hit, 1f,nav.areaMask))
+        //JumpAndSpinDamageToPlayer();
+        damageSphere.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        damageSphere.gameObject.SetActive(false);
+        if (NavMesh.SamplePosition(jumpDestination, out NavMeshHit hit, 1f, nav.areaMask))
         {
             nav.Warp(hit.position);
         }
         nav.enabled = true;
         state = State.unshieldedMovingWithShooting;
     }
-    
+
 
     private void Shielded()
     {
@@ -198,21 +233,21 @@ public class Boss : MonoBehaviour
         float distance = Vector3.Distance(bossBody.position, target.position);
 
         laser.localScale = new Vector3(1, 1, 1);
-        if (distance <= chaseRange+15)
+        if (distance <= chaseRange + 15)
         {
             nav.SetDestination(target.position);
         }
-        
+
         if (distance >= chaseRange && laserCoolDown >= nextLaser && Notlasered)
         {
-            
-            
+
+
             state = State.laserSpin;
         }
-        else if (distance >= chaseRange && jumpCoolDown>= nextJumpTime && Notjumped)
+        else if (distance >= chaseRange && jumpCoolDown >= nextJumpTime && Notjumped)
         {
-            
-            
+
+
             state = State.jumpAttack;
         }
     }

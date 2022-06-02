@@ -6,7 +6,9 @@ using UnityEngine;
 public class playerHealth : MonoBehaviour
 {
     [SerializeField] float playerHitPoint = 100f;
+    [SerializeField] float totalHitPoint = 100f;
     public GameObject GameOverUI;
+    public HealthBar healthBarObject;
     private void Start()
     {
 
@@ -19,6 +21,7 @@ public class playerHealth : MonoBehaviour
     public void playerTakeDamge(float damage)
     {
         playerHitPoint -= damage;
+        healthBarObject.UpdateHealth((float)playerHitPoint / (float)totalHitPoint);
         // print(playerHitPoint);
         if (playerHitPoint <= 0)
         {

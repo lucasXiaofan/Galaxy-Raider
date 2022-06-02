@@ -340,6 +340,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitPoint: 200
+  totalHitPoint: 200
+  healtbar: {fileID: 0}
 --- !u!136 &1935744924290126031
 CapsuleCollider:
   m_ObjectHideFlags: 0
