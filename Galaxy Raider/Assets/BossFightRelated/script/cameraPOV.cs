@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class cameraPOV : MonoBehaviour
 {
+
     private Camera playerCamera;
     private float targetFOV;
     private float fov;
