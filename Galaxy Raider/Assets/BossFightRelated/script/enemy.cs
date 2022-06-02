@@ -7,6 +7,7 @@ using UnityEngine.AI;
 
 public class enemy : MonoBehaviour
 {
+
     [SerializeField] Transform target;
     [SerializeField] float chaseRange = 5f;
     [SerializeField] float attackRange = 1f;
